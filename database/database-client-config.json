@@ -1,0 +1,37 @@
+{
+  "database": {
+    "1787266292951": {
+      "host": "localhost",
+      "port": 3306,
+      "user": "root",
+      "dbType": "MySQL",
+      "database": "ecommerce_db3",
+      "name": "MySQL Local",
+      "advance": {
+        "idleConfig": {
+          "enable": true
+        },
+        "hideSystemSchema": true,
+        "groupingTables": false,
+        "loadMetaDataWhenExpandTreeView": true
+      },
+      "treeFeatures": [],
+      "usingSSH": false,
+      "useSocksProxy": false,
+      "useHTTPProxy": false,
+      "global": true,
+      "savePassword": "Forever",
+      "readonly": false,
+      "sort": 11,
+      "useSSL": false,
+      "fs": {
+        "encoding": "utf8",
+        "showHidden": true
+      },
+      "key": "1787266292951",
+      "connectionKey": "database.connections"
+    }
+  },
+  "nosql": null,
+  "$schema": "http://127.0.0.1:8828/schema.json"
+}
