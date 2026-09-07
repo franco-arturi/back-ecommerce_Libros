@@ -55,7 +55,19 @@ el perfil `demo`.
 
 ## Configurar Postman
 
-Crear una colección y agregar la variable:
+La forma más rápida es importar el archivo:
+
+```text
+postman/Carrito-Demo.postman_collection.json
+```
+
+En Postman, seleccionar `Import`, elegir el archivo y abrir la colección
+`E-commerce JU - Carrito Demo`. Las solicitudes están numeradas para poder
+ejecutarlas en orden. La solicitud `2 - Agregar Clean Code` guarda
+automáticamente la variable `itemId`, que luego usan modificar y eliminar.
+
+También se puede configurar manualmente una colección siguiendo estos pasos.
+Para hacerlo, crear una colección y agregar la variable:
 
 ```text
 baseUrl = http://localhost:8080

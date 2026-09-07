@@ -1,0 +1,404 @@
+{
+  "info": {
+    "_postman_id": "0de5a0a8-550f-4bf9-bd87-3e14b8ac5d62",
+    "name": "E-commerce JU - Carrito Demo",
+    "description": "Colección para probar el módulo de carrito con el perfil demo y sus datos precargados.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080"
+    },
+    {
+      "key": "usuarioId",
+      "value": "1"
+    },
+    {
+      "key": "libroId",
+      "value": "1"
+    },
+    {
+      "key": "itemId",
+      "value": "1"
+    }
+  ],
+  "item": [
+    {
+      "name": "0 - Estado de la aplicación",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/actuator/health",
+          "host": ["{{baseUrl}}"],
+          "path": ["actuator", "health"]
+        },
+        "description": "Comprueba que Spring Boot esté levantado."
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('La aplicación está disponible', function () {",
+              "    pm.response.to.have.status(200);",
+              "    pm.expect(pm.response.json().status).to.eql('UP');",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "1 - Consultar carrito",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/carritos/{{usuarioId}}",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "carritos", "{{usuarioId}}"]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Carrito consultado', function () {",
+              "    pm.response.to.have.status(200);",
+              "    pm.expect(pm.response.json().usuarioId).to.eql(Number(pm.collectionVariables.get('usuarioId')));",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "2 - Agregar Clean Code",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"libroId\": {{libroId}},\n  \"cantidad\": 2\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/carritos/{{usuarioId}}/items",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "carritos", "{{usuarioId}}", "items"]
+        },
+        "description": "Agrega dos unidades del libro configurado y guarda automáticamente el ID del ítem."
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Libro agregado', function () {",
+              "    pm.response.to.have.status(200);",
+              "    const response = pm.response.json();",
+              "    pm.expect(response.items).to.have.length.above(0);",
+              "    const item = response.items.find(element => element.libroId === Number(pm.collectionVariables.get('libroId')));",
+              "    pm.expect(item).to.exist;",
+              "    pm.collectionVariables.set('itemId', String(item.id));",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "3 - Agregar El Principito",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"libroId\": 2,\n  \"cantidad\": 1\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/carritos/{{usuarioId}}/items",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "carritos", "{{usuarioId}}", "items"]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Segundo libro agregado', function () {",
+              "    pm.response.to.have.status(200);",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "4 - Modificar cantidad",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"cantidad\": 3\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/carritos/{{usuarioId}}/items/{{itemId}}",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "carritos", "{{usuarioId}}", "items", "{{itemId}}"]
+        },
+        "description": "Usa el itemId guardado por la solicitud 'Agregar Clean Code'."
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Cantidad modificada', function () {",
+              "    pm.response.to.have.status(200);",
+              "    const item = pm.response.json().items.find(element => element.id === Number(pm.collectionVariables.get('itemId')));",
+              "    pm.expect(item.cantidad).to.eql(3);",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "5 - Eliminar ítem",
+      "request": {
+        "method": "DELETE",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/carritos/{{usuarioId}}/items/{{itemId}}",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "carritos", "{{usuarioId}}", "items", "{{itemId}}"]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Ítem eliminado', function () {",
+              "    pm.response.to.have.status(204);",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "6 - Vaciar carrito",
+      "request": {
+        "method": "DELETE",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/carritos/{{usuarioId}}",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "carritos", "{{usuarioId}}"]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Carrito vaciado', function () {",
+              "    pm.response.to.have.status(204);",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Casos de error",
+      "item": [
+        {
+          "name": "Libro sin stock - 409",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"libroId\": 3,\n  \"cantidad\": 1\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/carritos/{{usuarioId}}/items",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "carritos", "{{usuarioId}}", "items"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Rechaza libro sin stock', function () {",
+                  "    pm.response.to.have.status(409);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Cantidad inválida - 400",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"libroId\": 1,\n  \"cantidad\": 0\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/carritos/{{usuarioId}}/items",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "carritos", "{{usuarioId}}", "items"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Rechaza cantidad inválida', function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Libro inexistente - 404",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"libroId\": 999,\n  \"cantidad\": 1\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/carritos/{{usuarioId}}/items",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "carritos", "{{usuarioId}}", "items"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Informa libro inexistente', function () {",
+                  "    pm.response.to.have.status(404);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Usuario inexistente - 404",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/carritos/999",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "carritos", "999"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Informa usuario inexistente', function () {",
+                  "    pm.response.to.have.status(404);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
