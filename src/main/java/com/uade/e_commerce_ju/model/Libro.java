@@ -21,6 +21,7 @@ public class Libro {
 	private String titulo;
 	private String autor;
 	private double precio;
+	private Integer stock;
 
 	public Long getId() {
 		return id;
@@ -52,5 +53,13 @@ public class Libro {
 
 	public void setPrecio(double precio) {
 		this.precio = precio;
+	}
+
+	public Integer getStock() {
+		return stock;
+	}
+
+	public void setStock(Integer stock) {
+		this.stock = stock;
 	}
 }
