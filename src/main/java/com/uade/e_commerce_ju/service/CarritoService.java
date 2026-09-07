@@ -57,8 +57,10 @@ public class CarritoService {
             throw new CantidadInvalidaException("El libroId es obligatorio");
         }
 
-        Carrito carrito = obtenerOCrearCarrito(usuarioId);
+        Usuario usuario = validarUsuario(usuarioId);
         Libro libro = buscarLibro(request.libroId());
+        validarStock(libro, request.cantidad());
+        Carrito carrito = obtenerOCrearCarrito(usuario);
         ItemCarrito item = itemCarritoRepository
             .findByCarritoIdAndLibroId(carrito.getId(), libro.getId())
             .orElse(null);
@@ -107,9 +109,8 @@ public class CarritoService {
         });
     }
 
-    private Carrito obtenerOCrearCarrito(Long usuarioId) {
-        Usuario usuario = validarUsuario(usuarioId);
-        return carritoRepository.findByUsuarioId(usuarioId).orElseGet(() -> {
+    private Carrito obtenerOCrearCarrito(Usuario usuario) {
+        return carritoRepository.findByUsuarioId(usuario.getId()).orElseGet(() -> {
             Carrito carrito = new Carrito();
             carrito.setUsuario(usuario);
             return carritoRepository.save(carrito);
