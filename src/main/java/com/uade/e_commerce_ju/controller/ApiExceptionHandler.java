@@ -5,11 +5,15 @@ import java.time.Instant;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import com.uade.e_commerce_ju.dto.error.ApiErrorDTO;
+import com.uade.e_commerce_ju.exception.ArgumentoInvalidoException;
 import com.uade.e_commerce_ju.exception.CantidadInvalidaException;
+import com.uade.e_commerce_ju.exception.CredencialesInvalidasException;
+import com.uade.e_commerce_ju.exception.OperacionNoAutorizadaException;
 import com.uade.e_commerce_ju.exception.RecursoNoEncontradoException;
 import com.uade.e_commerce_ju.exception.StockInsuficienteException;
 
@@ -42,12 +46,56 @@ public class ApiExceptionHandler {
         return crearRespuesta(HttpStatus.CONFLICT, exception.getMessage(), request);
     }
 
+    @ExceptionHandler(ArgumentoInvalidoException.class)
+    public ResponseEntity<ApiErrorDTO> manejarArgumentoInvalido(
+        ArgumentoInvalidoException exception,
+        HttpServletRequest request
+    ) {
+        return crearRespuesta(HttpStatus.BAD_REQUEST, exception.getMessage(), request);
+    }
+
+    @ExceptionHandler(CredencialesInvalidasException.class)
+    public ResponseEntity<ApiErrorDTO> manejarCredencialesInvalidas(
+        CredencialesInvalidasException exception,
+        HttpServletRequest request
+    ) {
+        return crearRespuesta(HttpStatus.UNAUTHORIZED, exception.getMessage(), request);
+    }
+
+    @ExceptionHandler(OperacionNoAutorizadaException.class)
+    public ResponseEntity<ApiErrorDTO> manejarOperacionNoAutorizada(
+        OperacionNoAutorizadaException exception,
+        HttpServletRequest request
+    ) {
+        return crearRespuesta(HttpStatus.FORBIDDEN, exception.getMessage(), request);
+    }
+
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ResponseEntity<ApiErrorDTO> manejarJsonInvalido(
         HttpMessageNotReadableException exception,
         HttpServletRequest request
     ) {
         return crearRespuesta(HttpStatus.BAD_REQUEST, "El cuerpo de la solicitud es invalido", request);
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<ApiErrorDTO> manejarValidacionDeBody(
+        MethodArgumentNotValidException exception,
+        HttpServletRequest request
+    ) {
+        String mensaje = exception.getBindingResult().getFieldErrors().stream()
+            .findFirst()
+            .map(error -> error.getField() + ": " + error.getDefaultMessage())
+            .orElse("El cuerpo de la solicitud contiene datos invalidos");
+        return crearRespuesta(HttpStatus.BAD_REQUEST, mensaje, request);
+    }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ApiErrorDTO> manejarErrorInesperado(
+        Exception exception,
+        HttpServletRequest request
+    ) {
+        return crearRespuesta(HttpStatus.INTERNAL_SERVER_ERROR, "Error interno del servidor", request);
     }
 
     private ResponseEntity<ApiErrorDTO> crearRespuesta(
