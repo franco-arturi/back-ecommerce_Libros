@@ -8,6 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.uade.e_commerce_ju.dto.carrito.AgregarItemDTO;
 import com.uade.e_commerce_ju.dto.carrito.CarritoResponseDTO;
+import com.uade.e_commerce_ju.dto.carrito.CheckoutResponseDTO;
 import com.uade.e_commerce_ju.dto.carrito.ItemCarritoDTO;
 import com.uade.e_commerce_ju.dto.carrito.ModificarCantidadDTO;
 import com.uade.e_commerce_ju.exception.CantidadInvalidaException;
@@ -188,5 +189,48 @@ public class CarritoService {
             item.getCantidad(),
             subtotal
         );
+    }
+    
+    // --- NUEVO MÉTODO PARA EL CHECKOUT ---
+    public CheckoutResponseDTO checkout(Long usuarioId) {
+        // Validamos que el usuario exista (reutilizando tu método)
+        validarUsuario(usuarioId);
+        
+        Carrito carrito = carritoRepository.findByUsuarioId(usuarioId)
+            .orElseThrow(() -> new RecursoNoEncontradoException("No se encontró un carrito para el usuario"));
+
+        // 1. Rechazar un carrito vacío
+        if (carrito.getItems().isEmpty()) {
+            throw new CantidadInvalidaException("No se puede hacer checkout de un carrito vacío");
+        }
+
+        // 2. Volver a validar todos los stocks antes de comprar
+        for (ItemCarrito item : carrito.getItems()) {
+            // Reutilizamos tu método privado que ya lanza la excepción si no hay stock
+            validarStock(item.getLibro(), item.getCantidad()); 
+        }
+
+        BigDecimal totalFinal = BigDecimal.ZERO;
+
+        // 3. Descontar stock y calcular total
+        for (ItemCarrito item : carrito.getItems()) {
+            Libro libro = item.getLibro();
+            
+            // Restamos el stock
+            libro.setStock(libro.getStock() - item.getCantidad());
+            libroRepository.save(libro);
+            
+            // Calculamos el subtotal y lo sumamos al total final usando BigDecimal
+            BigDecimal precio = BigDecimal.valueOf(libro.getPrecio());
+            BigDecimal subtotal = precio.multiply(BigDecimal.valueOf(item.getCantidad()));
+            totalFinal = totalFinal.add(subtotal);
+        }
+
+        // 4. Vaciar o finalizar el carrito tras una compra correcta
+        carrito.vaciar(); // Usamos el método vaciar() que ya tiene tu modelo Carrito
+        carritoRepository.save(carrito);
+
+        // 5. Devolver el total final (no procesamos pagos reales)
+        return new CheckoutResponseDTO(totalFinal, "Compra finalizada con éxito");
     }
 }
