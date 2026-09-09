@@ -18,4 +18,7 @@ public interface ImagenLibroRepository extends JpaRepository<ImagenLibro, Long> 
     Optional<ImagenLibro> findByIdAndLibroId(Long id, Long libroId);
 
     boolean existsByLibroIdAndUrl(Long libroId, String url);
+
+    // se usa al eliminar un libro: sus imagenes se borran antes que el
+    void deleteByLibroId(Long libroId);
 }

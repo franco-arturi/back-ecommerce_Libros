@@ -3,6 +3,8 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -16,7 +18,7 @@ import lombok.NoArgsConstructor;
 public class Libro {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    
+
 	private Long id;
 	private String titulo;
 	private String autor;
@@ -25,4 +27,10 @@ public class Libro {
 
 	private String descripcion;
 	private String categoria;
+
+	// las imagenes viven en la entidad ImagenLibro (punto 3.5)
+
+	@ManyToOne(optional = false)
+	@JoinColumn(name = "vendedor_id", nullable = false)
+	private Usuario vendedor;
 }

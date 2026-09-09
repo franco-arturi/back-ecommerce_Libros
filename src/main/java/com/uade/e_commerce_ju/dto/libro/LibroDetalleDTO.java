@@ -10,7 +10,8 @@ public record LibroDetalleDTO(
     Integer stock,
     String descripcion,
     String categoria,
-    List<ImagenLibroDTO> imagenes
+    List<ImagenLibroDTO> imagenes,
+    Long vendedorId
 ) {
-    
+
 }
