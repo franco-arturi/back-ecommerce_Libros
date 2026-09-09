@@ -10,9 +10,11 @@ import com.uade.e_commerce_ju.dto.categoria.CategoriaResponseDTO;
 import com.uade.e_commerce_ju.dto.categoria.CategoriaUpdateDTO;
 import com.uade.e_commerce_ju.exception.ArgumentoInvalidoException;
 import com.uade.e_commerce_ju.exception.RecursoDuplicadoException;
+import com.uade.e_commerce_ju.exception.RecursoEnUsoException;
 import com.uade.e_commerce_ju.exception.RecursoNoEncontradoException;
 import com.uade.e_commerce_ju.model.Categoria;
 import com.uade.e_commerce_ju.repository.CategoriaRepository;
+import com.uade.e_commerce_ju.repository.LibroRepository;
 
 @Service
 @Transactional
@@ -22,9 +24,14 @@ public class CategoriaService {
     private static final int LARGO_MAXIMO_DESCRIPCION = 500;
 
     private final CategoriaRepository categoriaRepository;
+    private final LibroRepository libroRepository;
 
-    public CategoriaService(CategoriaRepository categoriaRepository) {
+    public CategoriaService(
+        CategoriaRepository categoriaRepository,
+        LibroRepository libroRepository
+    ) {
         this.categoriaRepository = categoriaRepository;
+        this.libroRepository = libroRepository;
     }
 
     @Transactional(readOnly = true)
@@ -68,7 +75,13 @@ public class CategoriaService {
     }
 
     public void eliminar(Long id) {
-        categoriaRepository.delete(buscarCategoria(id));
+        Categoria categoria = buscarCategoria(id);
+        if (libroRepository.existsByCategoriaId(id)) {
+            throw new RecursoEnUsoException(
+                "No se puede eliminar la categoria porque tiene libros asociados"
+            );
+        }
+        categoriaRepository.delete(categoria);
     }
 
     private Categoria buscarCategoria(Long id) {
