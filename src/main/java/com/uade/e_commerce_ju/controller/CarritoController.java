@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.uade.e_commerce_ju.dto.carrito.AgregarItemDTO;
 import com.uade.e_commerce_ju.dto.carrito.CarritoResponseDTO;
+import com.uade.e_commerce_ju.dto.carrito.CheckoutResponseDTO;
 import com.uade.e_commerce_ju.dto.carrito.ModificarCantidadDTO;
 import com.uade.e_commerce_ju.service.CarritoService;
 
@@ -60,5 +61,11 @@ public class CarritoController {
     public ResponseEntity<Void> vaciar(@PathVariable Long usuarioId) {
         carritoService.vaciar(usuarioId);
         return ResponseEntity.noContent().build();
+    }
+    
+    @PostMapping("/{usuarioId}/checkout")
+    public ResponseEntity<CheckoutResponseDTO> checkout(@PathVariable Long usuarioId) {
+        CheckoutResponseDTO response = carritoService.checkout(usuarioId);
+        return ResponseEntity.ok(response);
     }
 }
