@@ -1,15 +1,12 @@
 package com.uade.e_commerce_ju.dto.libro;
 
-public record LibroDetalleDTO(
-    Long id,
+public record LibroActualizarDTO(
+    Long vendedorId,
     String titulo,
     String autor,
-    double precio,
-    Integer stock,
     String descripcion,
+    Double precio,
     String categoria,
-    String imagenes,
-    Long vendedorId
+    String imagenes
 ) {
-
 }
