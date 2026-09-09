@@ -25,5 +25,4 @@ public class Libro {
 
 	private String descripcion;
 	private String categoria;
-	private String imagenes;
 }

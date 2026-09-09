@@ -1,9 +1,11 @@
 package com.uade.e_commerce_ju.service;
 
 import org.springframework.stereotype.Service;
+import com.uade.e_commerce_ju.dto.libro.ImagenLibroDTO;
 import com.uade.e_commerce_ju.dto.libro.LibroDetalleDTO;
 import com.uade.e_commerce_ju.dto.libro.LibroListadoDTO;
 import com.uade.e_commerce_ju.model.Libro;
+import com.uade.e_commerce_ju.repository.ImagenLibroRepository;
 import com.uade.e_commerce_ju.repository.LibroRepository;
 
 import java.util.List;
@@ -13,9 +15,11 @@ import java.util.Optional;
 public class LibroService {
 
 	private final LibroRepository libroRepository;
+	private final ImagenLibroRepository imagenLibroRepository;
 
-	public LibroService(LibroRepository libroRepository) {
+	public LibroService(LibroRepository libroRepository, ImagenLibroRepository imagenLibroRepository) {
 		this.libroRepository = libroRepository;
+		this.imagenLibroRepository = imagenLibroRepository;
 	}
 
 	//obtener catalogo de libros con filtros y generar el listado DTO
@@ -32,7 +36,7 @@ public class LibroService {
             )).toList();
     }
 
-	//obtener libro por id y generar el detalle DTO
+	//obtener libro por id y generar el detalle DTO, incluyendo sus imagenes
 	public LibroDetalleDTO getLibroById(Long id) {
         Optional<Libro> libroOpt = libroRepository.findById(id);
         
@@ -41,6 +45,10 @@ public class LibroService {
         }
         
         Libro libro = libroOpt.get();
+        List<ImagenLibroDTO> imagenes = imagenLibroRepository.findByLibroIdOrderByIdAsc(libro.getId()).stream()
+            .map(imagen -> new ImagenLibroDTO(imagen.getId(), imagen.getUrl()))
+            .toList();
+
         return new LibroDetalleDTO(
             libro.getId(),
             libro.getTitulo(),
@@ -49,7 +57,7 @@ public class LibroService {
             libro.getStock(),
             libro.getDescripcion(),
             libro.getCategoria(),
-            libro.getImagenes()
+            imagenes
         );
     }
 }

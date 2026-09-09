@@ -1,5 +1,7 @@
 package com.uade.e_commerce_ju.dto.libro;
 
+import java.util.List;
+
 public record LibroDetalleDTO(
     Long id,
     String titulo,
@@ -8,7 +10,7 @@ public record LibroDetalleDTO(
     Integer stock,
     String descripcion,
     String categoria,
-    String imagenes
+    List<ImagenLibroDTO> imagenes
 ) {
     
 }
