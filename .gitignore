@@ -31,3 +31,6 @@ build/
 
 ### VS Code ###
 .vscode/
+
+### Notas privadas locales ###
+NOTAS-PRIVADAS-CARRITO.md

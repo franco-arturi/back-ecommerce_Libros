@@ -1,8 +1,10 @@
 package com.uade.e_commerce_ju.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import com.uade.e_commerce_ju.model.Libro;
+import java.util.List;
 
 /**
  * JpaRepository Provides CRUD operations and additional query methods for the Categoria
@@ -10,7 +12,12 @@ import com.uade.e_commerce_ju.model.Libro;
  * CategoriaRepository
  */
 
-public interface LibroRepository extends JpaRepository<Libro, Long>{
+public interface LibroRepository extends JpaRepository<Libro, Long> {
 
+    @Query("SELECT l FROM Libro l WHERE " +
+           "(:categoria IS NULL OR LOWER(l.categoria) LIKE LOWER(CONCAT('%', :categoria, '%'))) AND " +
+           "(:titulo IS NULL OR LOWER(l.titulo) LIKE LOWER(CONCAT('%', :titulo, '%'))) " +
+           "ORDER BY l.titulo ASC")
+    List<Libro> buscarConFiltrosYOrden(@Param("categoria") String categoria, @Param("titulo") String titulo);
     
-} 
+}
