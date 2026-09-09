@@ -1,0 +1,98 @@
+{
+  "info": {
+    "_postman_id": "7c41e2b9-3a6d-4f18-9c02-5b8e17d4a930",
+    "name": "E-commerce JU - Usuarios",
+    "description": "Endpoints de usuarios.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Registrar usuario",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"username\": \"rodrigo\",\n  \"email\": \"roro@test.com\",\n  \"password\": \"password123\",\n  \"nombre\": \"rodrigo\",\n  \"apellido\": \"gimenes\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:8080/api/usuarios/register",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8080",
+          "path": ["api", "usuarios", "register"]
+        },
+        "description": "POST /api/usuarios/register"
+      }
+    },
+    {
+      "name": "Login",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"roro@test.com\",\n  \"password\": \"password123\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:8080/api/usuarios/login",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8080",
+          "path": ["api", "usuarios", "login"]
+        },
+        "description": "POST /api/usuarios/login"
+      }
+    },
+    {
+      "name": "Listar usuarios",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8080/api/usuarios/listarUser",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8080",
+          "path": ["api", "usuarios", "listarUser"]
+        },
+        "description": "GET /api/usuarios/listarUser"
+      }
+    },
+    {
+      "name": "Buscar usuario por id",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8080/api/usuarios/1",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8080",
+          "path": ["api", "usuarios", "1"]
+        },
+        "description": "GET /api/usuarios/{id}"
+      }
+    }
+  ]
+}
