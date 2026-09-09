@@ -15,9 +15,13 @@ import java.util.List;
 public interface LibroRepository extends JpaRepository<Libro, Long> {
 
     @Query("SELECT l FROM Libro l WHERE " +
-           "(:categoria IS NULL OR LOWER(l.categoria) LIKE LOWER(CONCAT('%', :categoria, '%'))) AND " +
+           "(:categoriaId IS NULL OR l.categoria.id = :categoriaId) AND " +
            "(:titulo IS NULL OR LOWER(l.titulo) LIKE LOWER(CONCAT('%', :titulo, '%'))) " +
            "ORDER BY l.titulo ASC")
-    List<Libro> buscarConFiltrosYOrden(@Param("categoria") String categoria, @Param("titulo") String titulo);
-    
+    List<Libro> buscarConFiltrosYOrden(
+        @Param("categoriaId") Long categoriaId,
+        @Param("titulo") String titulo
+    );
+
+    boolean existsByCategoriaId(Long categoriaId);
 }
