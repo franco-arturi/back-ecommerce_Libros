@@ -14,6 +14,7 @@ import com.uade.e_commerce_ju.exception.ArgumentoInvalidoException;
 import com.uade.e_commerce_ju.exception.CantidadInvalidaException;
 import com.uade.e_commerce_ju.exception.CredencialesInvalidasException;
 import com.uade.e_commerce_ju.exception.OperacionNoAutorizadaException;
+import com.uade.e_commerce_ju.exception.RecursoDuplicadoException;
 import com.uade.e_commerce_ju.exception.RecursoNoEncontradoException;
 import com.uade.e_commerce_ju.exception.StockInsuficienteException;
 
@@ -28,6 +29,14 @@ public class ApiExceptionHandler {
         HttpServletRequest request
     ) {
         return crearRespuesta(HttpStatus.NOT_FOUND, exception.getMessage(), request);
+    }
+
+    @ExceptionHandler(RecursoDuplicadoException.class)
+    public ResponseEntity<ApiErrorDTO> manejarRecursoDuplicado(
+        RecursoDuplicadoException exception,
+        HttpServletRequest request
+    ) {
+        return crearRespuesta(HttpStatus.CONFLICT, exception.getMessage(), request);
     }
 
     @ExceptionHandler(CantidadInvalidaException.class)

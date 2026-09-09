@@ -34,7 +34,14 @@ class CarritoIntegrationTests {
 
     @Test
     void agregaYConsultaUnItemUsandoTodasLasCapas() throws Exception {
-        Usuario usuario = usuarioRepository.saveAndFlush(new Usuario());
+        Usuario usuario = new Usuario();
+        usuario.setUsername("tito");
+        usuario.setEmail("titoros@test.com");
+        usuario.setPassword("password123");
+        usuario.setNombre("tito");
+        usuario.setApellido("roso");
+        usuario = usuarioRepository.saveAndFlush(usuario);
+
         Libro libro = new Libro();
         libro.setTitulo("Clean Code");
         libro.setAutor("Robert C. Martin");

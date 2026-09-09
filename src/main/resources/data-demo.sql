@@ -1,5 +1,8 @@
-INSERT INTO usuarios (id) VALUES (1);
-INSERT INTO usuarios (id) VALUES (2);
+INSERT INTO usuarios (id, username, email, password, nombre, apellido)
+VALUES (1, 'axel', 'axel@demo.com', 'password123', 'Axel', 'Antognoli');
+
+INSERT INTO usuarios (id, username, email, password, nombre, apellido)
+VALUES (2, 'tito', 'roso@demo.com', 'password456', 'tito', 'roso');
 
 INSERT INTO libros (id, titulo, autor, precio, stock)
 VALUES (1, 'Clean Code', 'Robert C. Martin', 25000.00, 5);
