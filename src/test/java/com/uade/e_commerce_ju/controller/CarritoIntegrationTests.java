@@ -13,8 +13,10 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.uade.e_commerce_ju.model.Categoria;
 import com.uade.e_commerce_ju.model.Libro;
 import com.uade.e_commerce_ju.model.Usuario;
+import com.uade.e_commerce_ju.repository.CategoriaRepository;
 import com.uade.e_commerce_ju.repository.LibroRepository;
 import com.uade.e_commerce_ju.repository.UsuarioRepository;
 
@@ -32,6 +34,9 @@ class CarritoIntegrationTests {
     @Autowired
     private LibroRepository libroRepository;
 
+    @Autowired
+    private CategoriaRepository categoriaRepository;
+
     @Test
     void agregaYConsultaUnItemUsandoTodasLasCapas() throws Exception {
         Usuario usuario = new Usuario();
@@ -42,12 +47,17 @@ class CarritoIntegrationTests {
         usuario.setApellido("roso");
         usuario = usuarioRepository.saveAndFlush(usuario);
 
+        Categoria categoria = new Categoria();
+        categoria.setNombre("Programacion");
+        categoria = categoriaRepository.saveAndFlush(categoria);
+
         Libro libro = new Libro();
         libro.setVendedor(usuario);
         libro.setTitulo("Clean Code");
         libro.setAutor("Robert C. Martin");
         libro.setPrecio(25000.0);
         libro.setStock(5);
+        libro.setCategoria(categoria);
         libro = libroRepository.saveAndFlush(libro);
 
         mockMvc.perform(post("/api/carritos/{usuarioId}/items", usuario.getId())

@@ -1,5 +1,7 @@
 package com.uade.e_commerce_ju.repository;
 
+import java.util.List;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import com.uade.e_commerce_ju.model.Categoria;
@@ -10,5 +12,10 @@ import com.uade.e_commerce_ju.model.Categoria;
  * CategoriaRepository
  */
 public interface CategoriaRepository extends JpaRepository<Categoria, Long> {
-    
+
+    List<Categoria> findAllByOrderByNombreAsc();
+
+    boolean existsByNombreIgnoreCase(String nombre);
+
+    boolean existsByNombreIgnoreCaseAndIdNot(String nombre, Long id);
 }

@@ -7,6 +7,6 @@ public record LibroAltaDTO(
     String descripcion,
     Double precio,
     Integer stock,
-    String categoria
+    Long categoriaId
 ) {
 }

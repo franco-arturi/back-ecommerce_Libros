@@ -26,7 +26,10 @@ public class Libro {
 	private Integer stock;
 
 	private String descripcion;
-	private String categoria;
+
+	@ManyToOne(optional = false)
+	@JoinColumn(name = "categoria_id", nullable = false)
+	private Categoria categoria;
 
 	// las imagenes viven en la entidad ImagenLibro (punto 3.5)
 

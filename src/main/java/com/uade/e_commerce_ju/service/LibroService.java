@@ -3,6 +3,7 @@ package com.uade.e_commerce_ju.service;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.uade.e_commerce_ju.dto.categoria.CategoriaResponseDTO;
 import com.uade.e_commerce_ju.dto.libro.ImagenLibroDTO;
 import com.uade.e_commerce_ju.dto.libro.LibroActualizarDTO;
 import com.uade.e_commerce_ju.dto.libro.LibroActualizarStockDTO;
@@ -12,8 +13,10 @@ import com.uade.e_commerce_ju.dto.libro.LibroListadoDTO;
 import com.uade.e_commerce_ju.exception.ArgumentoInvalidoException;
 import com.uade.e_commerce_ju.exception.OperacionNoAutorizadaException;
 import com.uade.e_commerce_ju.exception.RecursoNoEncontradoException;
+import com.uade.e_commerce_ju.model.Categoria;
 import com.uade.e_commerce_ju.model.Libro;
 import com.uade.e_commerce_ju.model.Usuario;
+import com.uade.e_commerce_ju.repository.CategoriaRepository;
 import com.uade.e_commerce_ju.repository.ImagenLibroRepository;
 import com.uade.e_commerce_ju.repository.LibroRepository;
 import com.uade.e_commerce_ju.repository.UsuarioRepository;
@@ -28,21 +31,29 @@ public class LibroService {
 	private final LibroRepository libroRepository;
 	private final UsuarioRepository usuarioRepository;
 	private final ImagenLibroRepository imagenLibroRepository;
+	private final CategoriaRepository categoriaRepository;
 
 	public LibroService(
 		LibroRepository libroRepository,
 		UsuarioRepository usuarioRepository,
-		ImagenLibroRepository imagenLibroRepository
+		ImagenLibroRepository imagenLibroRepository,
+		CategoriaRepository categoriaRepository
 	) {
 		this.libroRepository = libroRepository;
 		this.usuarioRepository = usuarioRepository;
 		this.imagenLibroRepository = imagenLibroRepository;
+		this.categoriaRepository = categoriaRepository;
 	}
 
 	//obtener catalogo de libros con filtros y generar el listado DTO
 	@Transactional(readOnly = true)
-	public List<LibroListadoDTO> getLibros(String categoria, String titulo) {
-        List<Libro> libros = libroRepository.buscarConFiltrosYOrden(categoria, titulo);
+    public List<LibroListadoDTO> getLibros(Long categoriaId, String titulo) {
+        if (categoriaId != null && !categoriaRepository.existsById(categoriaId)) {
+            throw new RecursoNoEncontradoException(
+                "No existe la categoria con id " + categoriaId
+            );
+        }
+        List<Libro> libros = libroRepository.buscarConFiltrosYOrden(categoriaId, titulo);
 
         return libros.stream()
             .map(libro -> new LibroListadoDTO(
@@ -50,7 +61,7 @@ public class LibroService {
                 libro.getTitulo(),
                 libro.getAutor(),
                 libro.getPrecio(),
-                libro.getCategoria()
+                crearCategoriaRespuesta(libro.getCategoria())
             )).toList();
     }
 
@@ -74,6 +85,7 @@ public class LibroService {
 		}
 
 		Usuario vendedor = buscarVendedor(request.vendedorId());
+		Categoria categoria = buscarCategoria(request.categoriaId());
 		String titulo = obligatorio(request.titulo(), "titulo");
 		validarPrecio(request.precio());
 		validarStock(request.stock());
@@ -85,7 +97,7 @@ public class LibroService {
 		libro.setDescripcion(request.descripcion());
 		libro.setPrecio(request.precio());
 		libro.setStock(request.stock());
-		libro.setCategoria(request.categoria());
+		libro.setCategoria(categoria);
 
 		return crearDetalle(libroRepository.save(libro));
 	}
@@ -98,6 +110,7 @@ public class LibroService {
 
 		Libro libro = buscarLibro(id);
 		validarPropietario(libro, request.vendedorId());
+		Categoria categoria = buscarCategoria(request.categoriaId());
 
 		String titulo = obligatorio(request.titulo(), "titulo");
 		validarPrecio(request.precio());
@@ -106,7 +119,7 @@ public class LibroService {
 		libro.setAutor(request.autor());
 		libro.setDescripcion(request.descripcion());
 		libro.setPrecio(request.precio());
-		libro.setCategoria(request.categoria());
+		libro.setCategoria(categoria);
 
 		return crearDetalle(libroRepository.save(libro));
 	}
@@ -146,6 +159,16 @@ public class LibroService {
 		}
 		return usuarioRepository.findById(vendedorId)
 			.orElseThrow(() -> new RecursoNoEncontradoException("No existe el usuario con id " + vendedorId));
+	}
+
+	private Categoria buscarCategoria(Long categoriaId) {
+		if (categoriaId == null) {
+			throw new ArgumentoInvalidoException("El categoriaId es obligatorio");
+		}
+		return categoriaRepository.findById(categoriaId)
+			.orElseThrow(() -> new RecursoNoEncontradoException(
+				"No existe la categoria con id " + categoriaId
+			));
 	}
 
 	private void validarPropietario(Libro libro, Long vendedorId) {
@@ -191,9 +214,17 @@ public class LibroService {
             libro.getPrecio(),
             libro.getStock(),
             libro.getDescripcion(),
-            libro.getCategoria(),
+            crearCategoriaRespuesta(libro.getCategoria()),
             imagenes,
             libro.getVendedor().getId()
         );
+	}
+
+	private CategoriaResponseDTO crearCategoriaRespuesta(Categoria categoria) {
+		return new CategoriaResponseDTO(
+			categoria.getId(),
+			categoria.getNombre(),
+			categoria.getDescripcion()
+		);
 	}
 }

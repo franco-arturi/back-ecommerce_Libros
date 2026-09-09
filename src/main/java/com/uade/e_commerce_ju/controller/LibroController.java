@@ -32,10 +32,10 @@ public class LibroController {
 
     @GetMapping
     public ResponseEntity<List<LibroListadoDTO>> getLibros(
-            @RequestParam(required = false) String categoria,
+            @RequestParam(required = false) Long categoriaId,
             @RequestParam(required = false) String titulo) {
 
-        List<LibroListadoDTO> libros = libroService.getLibros(categoria, titulo);
+        List<LibroListadoDTO> libros = libroService.getLibros(categoriaId, titulo);
         return ResponseEntity.ok(libros);
     }
 
