@@ -22,7 +22,6 @@ import com.uade.e_commerce_ju.repository.LibroRepository;
 import com.uade.e_commerce_ju.repository.UsuarioRepository;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @Transactional
@@ -68,13 +67,7 @@ public class LibroService {
 	//obtener libro por id y generar el detalle DTO, con sus imagenes
 	@Transactional(readOnly = true)
 	public LibroDetalleDTO getLibroById(Long id) {
-        Optional<Libro> libroOpt = libroRepository.findById(id);
-
-        if (libroOpt.isEmpty()) {
-            return null;
-        }
-
-        return crearDetalle(libroOpt.get());
+        return crearDetalle(buscarLibro(id));
     }
 
 	// alta de una publicacion de libro. Las imagenes se cargan aparte,

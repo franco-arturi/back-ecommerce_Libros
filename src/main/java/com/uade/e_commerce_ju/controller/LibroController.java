@@ -39,14 +39,10 @@ public class LibroController {
         return ResponseEntity.ok(libros);
     }
 
-    // GET http://localhost:8080/api/libros/1 (manejo de error 404)
+    // GET http://localhost:8080/api/libros/1 (404 manejado por ApiExceptionHandler)
     @GetMapping("/{id}")
     public ResponseEntity<LibroDetalleDTO> getLibroById(@PathVariable Long id) {
-        LibroDetalleDTO libro = libroService.getLibroById(id);
-        if (libro == null) {
-            return ResponseEntity.notFound().build();
-        }
-        return ResponseEntity.ok(libro);
+        return ResponseEntity.ok(libroService.getLibroById(id));
     }
 
     // alta de una publicacion
