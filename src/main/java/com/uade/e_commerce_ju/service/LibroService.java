@@ -3,6 +3,7 @@ package com.uade.e_commerce_ju.service;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.uade.e_commerce_ju.dto.libro.ImagenLibroDTO;
 import com.uade.e_commerce_ju.dto.libro.LibroActualizarDTO;
 import com.uade.e_commerce_ju.dto.libro.LibroActualizarStockDTO;
 import com.uade.e_commerce_ju.dto.libro.LibroAltaDTO;
@@ -13,6 +14,7 @@ import com.uade.e_commerce_ju.exception.OperacionNoAutorizadaException;
 import com.uade.e_commerce_ju.exception.RecursoNoEncontradoException;
 import com.uade.e_commerce_ju.model.Libro;
 import com.uade.e_commerce_ju.model.Usuario;
+import com.uade.e_commerce_ju.repository.ImagenLibroRepository;
 import com.uade.e_commerce_ju.repository.LibroRepository;
 import com.uade.e_commerce_ju.repository.UsuarioRepository;
 
@@ -25,10 +27,16 @@ public class LibroService {
 
 	private final LibroRepository libroRepository;
 	private final UsuarioRepository usuarioRepository;
+	private final ImagenLibroRepository imagenLibroRepository;
 
-	public LibroService(LibroRepository libroRepository, UsuarioRepository usuarioRepository) {
+	public LibroService(
+		LibroRepository libroRepository,
+		UsuarioRepository usuarioRepository,
+		ImagenLibroRepository imagenLibroRepository
+	) {
 		this.libroRepository = libroRepository;
 		this.usuarioRepository = usuarioRepository;
+		this.imagenLibroRepository = imagenLibroRepository;
 	}
 
 	//obtener catalogo de libros con filtros y generar el listado DTO
@@ -46,7 +54,7 @@ public class LibroService {
             )).toList();
     }
 
-	//obtener libro por id y generar el detalle DTO
+	//obtener libro por id y generar el detalle DTO, con sus imagenes
 	@Transactional(readOnly = true)
 	public LibroDetalleDTO getLibroById(Long id) {
         Optional<Libro> libroOpt = libroRepository.findById(id);
@@ -58,7 +66,8 @@ public class LibroService {
         return crearDetalle(libroOpt.get());
     }
 
-	// alta de una publicacion de libro
+	// alta de una publicacion de libro. Las imagenes se cargan aparte,
+	// con POST /api/libros/{libroId}/imagenes
 	public LibroDetalleDTO crear(LibroAltaDTO request) {
 		if (request == null) {
 			throw new ArgumentoInvalidoException("El cuerpo de la solicitud es obligatorio");
@@ -77,7 +86,6 @@ public class LibroService {
 		libro.setPrecio(request.precio());
 		libro.setStock(request.stock());
 		libro.setCategoria(request.categoria());
-		libro.setImagenes(request.imagenes());
 
 		return crearDetalle(libroRepository.save(libro));
 	}
@@ -99,7 +107,6 @@ public class LibroService {
 		libro.setDescripcion(request.descripcion());
 		libro.setPrecio(request.precio());
 		libro.setCategoria(request.categoria());
-		libro.setImagenes(request.imagenes());
 
 		return crearDetalle(libroRepository.save(libro));
 	}
@@ -123,6 +130,8 @@ public class LibroService {
 	public void eliminar(Long id, Long vendedorId) {
 		Libro libro = buscarLibro(id);
 		validarPropietario(libro, vendedorId);
+		// las imagenes apuntan al libro con una clave foranea, asi que van primero
+		imagenLibroRepository.deleteByLibroId(id);
 		libroRepository.delete(libro);
 	}
 
@@ -170,6 +179,11 @@ public class LibroService {
 	}
 
 	private LibroDetalleDTO crearDetalle(Libro libro) {
+		List<ImagenLibroDTO> imagenes = imagenLibroRepository
+			.findByLibroIdOrderByIdAsc(libro.getId()).stream()
+			.map(imagen -> new ImagenLibroDTO(imagen.getId(), imagen.getUrl()))
+			.toList();
+
 		return new LibroDetalleDTO(
             libro.getId(),
             libro.getTitulo(),
@@ -178,7 +192,7 @@ public class LibroService {
             libro.getStock(),
             libro.getDescripcion(),
             libro.getCategoria(),
-            libro.getImagenes(),
+            imagenes,
             libro.getVendedor().getId()
         );
 	}

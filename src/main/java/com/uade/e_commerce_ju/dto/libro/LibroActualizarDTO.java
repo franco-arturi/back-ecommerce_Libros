@@ -6,7 +6,6 @@ public record LibroActualizarDTO(
     String autor,
     String descripcion,
     Double precio,
-    String categoria,
-    String imagenes
+    String categoria
 ) {
 }

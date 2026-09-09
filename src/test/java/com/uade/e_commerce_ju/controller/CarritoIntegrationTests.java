@@ -43,6 +43,7 @@ class CarritoIntegrationTests {
         usuario = usuarioRepository.saveAndFlush(usuario);
 
         Libro libro = new Libro();
+        libro.setVendedor(usuario);
         libro.setTitulo("Clean Code");
         libro.setAutor("Robert C. Martin");
         libro.setPrecio(25000.0);

@@ -1,4 +1,6 @@
 package com.uade.e_commerce_ju.model;
+
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -14,23 +16,18 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "Libros")
-public class Libro {
+@Table(name = "Imagenes_Libro")
+public class ImagenLibro {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-	private Long id;
-	private String titulo;
-	private String autor;
-	private double precio;
-	private Integer stock;
+    // Un libro puede tener muchas imagenes. La imagen siempre pertenece a un libro.
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "libro_id", nullable = false)
+    private Libro libro;
 
-	private String descripcion;
-	private String categoria;
-
-	// las imagenes viven en la entidad ImagenLibro (punto 3.5)
-
-	@ManyToOne(optional = false)
-	@JoinColumn(name = "vendedor_id", nullable = false)
-	private Usuario vendedor;
+    @Column(name = "url", nullable = false, length = 500)
+    private String url;
 }

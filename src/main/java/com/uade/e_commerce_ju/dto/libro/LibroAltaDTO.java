@@ -7,7 +7,6 @@ public record LibroAltaDTO(
     String descripcion,
     Double precio,
     Integer stock,
-    String categoria,
-    String imagenes
+    String categoria
 ) {
 }
