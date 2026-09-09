@@ -1,42 +1,62 @@
 package com.uade.e_commerce_ju.controller;
 
+import java.net.URI;
+import java.util.List;
+
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.uade.e_commerce_ju.model.Categoria;
+import com.uade.e_commerce_ju.dto.categoria.CategoriaCreateDTO;
+import com.uade.e_commerce_ju.dto.categoria.CategoriaResponseDTO;
+import com.uade.e_commerce_ju.dto.categoria.CategoriaUpdateDTO;
 import com.uade.e_commerce_ju.service.CategoriaService;
 
-import java.util.List;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-
-
-
-// http://localhost:8080/api/Categorias
 @RestController
-@RequestMapping("/api/Categorias")
+@RequestMapping("/api/categorias")
 public class CategoriaController {
 
-    private final CategoriaService CategoriaService;
+    private final CategoriaService categoriaService;
 
-    CategoriaController(CategoriaService CategoriaService) {
-        this.CategoriaService = CategoriaService;
+    CategoriaController(CategoriaService categoriaService) {
+        this.categoriaService = categoriaService;
     }
 
-
-    // get http://localhost:8080/api/Categorias
-    @GetMapping()
-    public List<Categoria> getAllCategorias() {
-        return CategoriaService.getAllCategorias();
+    @GetMapping
+    public ResponseEntity<List<CategoriaResponseDTO>> listar() {
+        return ResponseEntity.ok(categoriaService.listar());
     }
 
-    // get http://localhost:8080/api/Categorias/1
     @GetMapping("/{id}")
-    public Categoria getCategoriaById(@PathVariable Long id) {
-        return null;
+    public ResponseEntity<CategoriaResponseDTO> obtenerPorId(@PathVariable Long id) {
+        return ResponseEntity.ok(categoriaService.obtenerPorId(id));
     }
-    
-    
+
+    @PostMapping
+    public ResponseEntity<CategoriaResponseDTO> crear(@RequestBody CategoriaCreateDTO request) {
+        CategoriaResponseDTO categoria = categoriaService.crear(request);
+        return ResponseEntity
+            .created(URI.create("/api/categorias/" + categoria.id()))
+            .body(categoria);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<CategoriaResponseDTO> actualizar(
+        @PathVariable Long id,
+        @RequestBody CategoriaUpdateDTO request
+    ) {
+        return ResponseEntity.ok(categoriaService.actualizar(id, request));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> eliminar(@PathVariable Long id) {
+        categoriaService.eliminar(id);
+        return ResponseEntity.noContent().build();
+    }
 }
