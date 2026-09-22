@@ -2,8 +2,9 @@ package com.uade.e_commerce_ju.controller;
 
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.ResponseEntity;
 
-import com.uade.e_commerce_ju.model.Categoria;
+import com.uade.e_commerce_ju.dto.categoria.CategoriaResponseDTO;
 import com.uade.e_commerce_ju.service.CategoriaService;
 
 import java.util.List;
@@ -28,14 +29,16 @@ public class CategoriaController {
 
     // get http://localhost:8080/api/Categorias
     @GetMapping()
-    public List<Categoria> getAllCategorias() {
-        return CategoriaService.getAllCategorias();
+    public ResponseEntity<List<CategoriaResponseDTO>> getAllCategorias() {
+        return ResponseEntity.ok(CategoriaService.getAllCategorias());
     }
 
     // get http://localhost:8080/api/Categorias/1
     @GetMapping("/{id}")
-    public Categoria getCategoriaById(@PathVariable Long id) {
-        return null;
+    public ResponseEntity<CategoriaResponseDTO> getCategoriaById(@PathVariable Long id) {
+        return CategoriaService.getCategoriaById(id)
+            .map(ResponseEntity::ok)
+            .orElseGet(() -> ResponseEntity.notFound().build());
     }
     
     
