@@ -7,9 +7,15 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.web.HttpMediaTypeNotSupportedException;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.servlet.NoHandlerFoundException;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.uade.e_commerce_ju.dto.error.ApiErrorDTO;
 import com.uade.e_commerce_ju.exception.ArgumentoInvalidoException;
@@ -25,6 +31,8 @@ import jakarta.servlet.http.HttpServletRequest;
 
 @RestControllerAdvice
 public class ApiExceptionHandler {
+
+    private static final Logger log = LoggerFactory.getLogger(ApiExceptionHandler.class);
 
     @ExceptionHandler(RecursoNoEncontradoException.class)
     public ResponseEntity<ApiErrorDTO> manejarNoEncontrado(
@@ -114,6 +122,38 @@ public class ApiExceptionHandler {
         return crearRespuesta(HttpStatus.BAD_REQUEST, "El cuerpo de la solicitud es invalido", request);
     }
 
+    @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
+    public ResponseEntity<ApiErrorDTO> manejarMetodoNoSoportado(
+        HttpRequestMethodNotSupportedException exception,
+        HttpServletRequest request
+    ) {
+        return crearRespuesta(
+            HttpStatus.METHOD_NOT_ALLOWED,
+            "El metodo " + exception.getMethod() + " no esta soportado para este recurso",
+            request
+        );
+    }
+
+    @ExceptionHandler(HttpMediaTypeNotSupportedException.class)
+    public ResponseEntity<ApiErrorDTO> manejarContentTypeNoSoportado(
+        HttpMediaTypeNotSupportedException exception,
+        HttpServletRequest request
+    ) {
+        return crearRespuesta(
+            HttpStatus.UNSUPPORTED_MEDIA_TYPE,
+            "El Content-Type debe ser application/json",
+            request
+        );
+    }
+
+    @ExceptionHandler(NoHandlerFoundException.class)
+    public ResponseEntity<ApiErrorDTO> manejarRecursoInexistente(
+        NoHandlerFoundException exception,
+        HttpServletRequest request
+    ) {
+        return crearRespuesta(HttpStatus.NOT_FOUND, "El recurso solicitado no existe", request);
+    }
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ApiErrorDTO> manejarValidacionDeBody(
         MethodArgumentNotValidException exception,
@@ -131,6 +171,7 @@ public class ApiExceptionHandler {
         Exception exception,
         HttpServletRequest request
     ) {
+        log.error("Error inesperado en {}", request.getRequestURI(), exception);
         return crearRespuesta(HttpStatus.INTERNAL_SERVER_ERROR, "Error interno del servidor", request);
     }
 
