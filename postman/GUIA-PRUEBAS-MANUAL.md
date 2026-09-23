@@ -16,6 +16,12 @@ con casos **positivos** y **negativos**, contra MySQL (perfil por defecto, la ap
 - Reemplazar `{{usuarioId}}`, `{{categoriaId}}`, `{{libroId}}`, etc. por el `id` real que devuelve
   la respuesta del paso donde se creó ese recurso.
 - `Content-Type: application/json` en todos los `POST`/`PUT` con body.
+- **Autenticación (JWT):** registro y login (`/api/auth/**`) y los `GET` de libros y categorías
+  son públicos. Todo lo demás necesita el token que devuelve el login (paso 1.4). En Postman:
+  pestaña **Authorization → Type: Bearer Token** y pegar el valor del campo `token`. Sin token la
+  API responde `401 Unauthorized`; con un usuario sin el rol necesario, `403 Forbidden`.
+- Hay un usuario administrador creado automáticamente al arrancar:
+  `admin@ecommerce.com` / `admin123` (configurable en `application.properties`).
 - El username/email/nombre de categoría usan `test` como sufijo fijo. Si ya corriste esta guía
   antes y los pasos 1.1, 1.8 o 2.1 te dan `409` (duplicado), cambiá `test` por otro texto (por
   ejemplo `test2`) en esos 3 pasos y en los que reutilizan el mismo email (1.4, 1.5) o nombre
@@ -36,7 +42,7 @@ con casos **positivos** y **negativos**, contra MySQL (perfil por defecto, la ap
 
 ### 1.1 Registrar usuario (vendedor/comprador) — ✅ POSITIVO
 
-`POST http://localhost:8080/api/usuarios/register`
+`POST http://localhost:8080/api/auth/register`
 
 ```json
 {
@@ -52,7 +58,7 @@ con casos **positivos** y **negativos**, contra MySQL (perfil por defecto, la ap
 
 ### 1.2 Registrar usuario con email duplicado — ❌ NEGATIVO
 
-`POST http://localhost:8080/api/usuarios/register`
+`POST http://localhost:8080/api/auth/register`
 
 Body: igual al anterior (mismo email, username distinto).
 
@@ -60,7 +66,7 @@ Body: igual al anterior (mismo email, username distinto).
 
 ### 1.3 Registrar usuario sin nombre — ❌ NEGATIVO
 
-`POST http://localhost:8080/api/usuarios/register`
+`POST http://localhost:8080/api/auth/register`
 
 ```json
 {
@@ -76,7 +82,7 @@ Body: igual al anterior (mismo email, username distinto).
 
 ### 1.4 Login correcto — ✅ POSITIVO
 
-`POST http://localhost:8080/api/usuarios/login`
+`POST http://localhost:8080/api/auth/login`
 
 ```json
 {
@@ -85,11 +91,13 @@ Body: igual al anterior (mismo email, username distinto).
 }
 ```
 
-**Esperado:** `200 OK`, con el mismo `id` que `{{usuarioId}}`.
+**Esperado:** `200 OK`. La respuesta trae `token`, `tipo` (`Bearer`), `expiraEnSegundos` y el
+`usuario` (con el mismo `id` que `{{usuarioId}}` y `rol: USER`). Guardar el `token` como
+`{{token}}` y usarlo en los pasos siguientes que no sean públicos.
 
 ### 1.5 Login con credenciales inválidas — ❌ NEGATIVO
 
-`POST http://localhost:8080/api/usuarios/login`
+`POST http://localhost:8080/api/auth/login`
 
 ```json
 {
@@ -114,7 +122,7 @@ Body: igual al anterior (mismo email, username distinto).
 
 ### 1.8 Registrar segundo usuario (para casos de "no autorizado") — ✅ POSITIVO
 
-`POST http://localhost:8080/api/usuarios/register`
+`POST http://localhost:8080/api/auth/register`
 
 ```json
 {

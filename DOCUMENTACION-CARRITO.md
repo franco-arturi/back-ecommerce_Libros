@@ -4,6 +4,11 @@ Esta guía explica cómo levantar el backend con datos precargados y probar el
 módulo de carrito desde Postman. El perfil `demo` usa una base H2 en memoria,
 por lo que no requiere instalar ni configurar MySQL.
 
+> **Autenticación:** los endpoints del carrito requieren JWT. Antes de probarlos, hacer
+> `POST /api/auth/login` con un usuario precargado (por ejemplo `axel@demo.com` / `password123`)
+> y enviar el `token` recibido en el header `Authorization: Bearer <token>` (en Postman:
+> pestaña Authorization → Bearer Token). Ver la sección "Seguridad" del README.
+
 ## Requisitos
 
 - Java 21.
