@@ -27,25 +27,25 @@ public class CarritoController {
     }
 
     @GetMapping("/{usuarioId}")
-    public CarritoResponseDTO obtener(@PathVariable Long usuarioId) {
-        return carritoService.obtenerPorUsuario(usuarioId);
+    public ResponseEntity<CarritoResponseDTO> obtener(@PathVariable Long usuarioId) {
+        return ResponseEntity.ok(carritoService.obtenerPorUsuario(usuarioId));
     }
 
     @PostMapping("/{usuarioId}/items")
-    public CarritoResponseDTO agregarItem(
+    public ResponseEntity<CarritoResponseDTO> agregarItem(
         @PathVariable Long usuarioId,
         @RequestBody AgregarItemDTO request
     ) {
-        return carritoService.agregarItem(usuarioId, request);
+        return ResponseEntity.ok(carritoService.agregarItem(usuarioId, request));
     }
 
     @PutMapping("/{usuarioId}/items/{itemId}")
-    public CarritoResponseDTO modificarCantidad(
+    public ResponseEntity<CarritoResponseDTO> modificarCantidad(
         @PathVariable Long usuarioId,
         @PathVariable Long itemId,
         @RequestBody ModificarCantidadDTO request
     ) {
-        return carritoService.modificarCantidad(usuarioId, itemId, request);
+        return ResponseEntity.ok(carritoService.modificarCantidad(usuarioId, itemId, request));
     }
 
     @DeleteMapping("/{usuarioId}/items/{itemId}")
