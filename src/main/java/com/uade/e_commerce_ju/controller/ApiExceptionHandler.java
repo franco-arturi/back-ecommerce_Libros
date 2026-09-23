@@ -5,6 +5,8 @@ import java.time.Instant;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -86,6 +88,22 @@ public class ApiExceptionHandler {
         HttpServletRequest request
     ) {
         return crearRespuesta(HttpStatus.FORBIDDEN, exception.getMessage(), request);
+    }
+
+    @ExceptionHandler(AuthenticationException.class)
+    public ResponseEntity<ApiErrorDTO> manejarAutenticacion(
+        AuthenticationException exception,
+        HttpServletRequest request
+    ) {
+        return crearRespuesta(HttpStatus.UNAUTHORIZED, "Email o password incorrectos", request);
+    }
+
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<ApiErrorDTO> manejarAccesoDenegado(
+        AccessDeniedException exception,
+        HttpServletRequest request
+    ) {
+        return crearRespuesta(HttpStatus.FORBIDDEN, "No tiene permisos para realizar esta operacion", request);
     }
 
     @ExceptionHandler(HttpMessageNotReadableException.class)
