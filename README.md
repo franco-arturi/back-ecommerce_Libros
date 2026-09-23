@@ -6,7 +6,8 @@ y checkout con descuento de stock.
 
 ## Stack
 
-- Java 21, Spring Boot 4.1 (Web, Data JPA, Actuator)
+- Java 21, Spring Boot 4.1 (Web, Data JPA, Actuator, Security)
+- Autenticación con JWT (jjwt 0.12.6) y contraseñas encriptadas con BCrypt
 - MySQL (persistencia principal) / H2 en memoria (perfil `demo`)
 - Maven (`mvnw` / `mvnw.cmd`)
 
@@ -100,7 +101,8 @@ las tablas y relaciones automáticamente al iniciar contra una base vacía.
 
 | Módulo | Endpoint |
 |---|---|
-| Usuarios | `POST /api/usuarios/register`, `POST /api/usuarios/login`, `GET /api/usuarios/{id}`, `GET /api/usuarios/listarUser` |
+| Autenticación | `POST /api/auth/register`, `POST /api/auth/login` (públicos) |
+| Usuarios | `GET /api/usuarios/{id}`, `GET /api/usuarios/listarUser` (solo ADMIN) |
 | Categorías | `GET /api/categorias`, `GET /api/categorias/{id}`, `POST /api/categorias`, `PUT /api/categorias/{id}`, `DELETE /api/categorias/{id}` |
 | Libros | `GET /api/libros`, `GET /api/libros/{id}`, `POST /api/libros`, `PUT /api/libros/{id}`, `PUT /api/libros/{id}/stock`, `DELETE /api/libros/{id}` |
 | Imágenes de libro | `GET/POST /api/libros/{libroId}/imagenes`, `DELETE /api/libros/{libroId}/imagenes/{imagenId}` |
@@ -108,6 +110,39 @@ las tablas y relaciones automáticamente al iniciar contra una base vacía.
 
 Los errores se devuelven en un formato uniforme (`timestamp`, `status`, `error`, `mensaje`, `path`),
 manejado de forma centralizada en `ApiExceptionHandler`.
+
+## Seguridad (Spring Security + JWT)
+
+La API es **stateless**: no guarda sesión, cada request se autentica con un JSON Web Token.
+
+1. `POST /api/auth/register` crea el usuario con rol `USER` y la contraseña encriptada con BCrypt.
+   Responde `201 Created` sin devolver la contraseña.
+2. `POST /api/auth/login` valida email y contraseña con el `AuthenticationManager` y devuelve un
+   JWT firmado (vence en 1 hora):
+
+   ```json
+   { "token": "eyJhbGciOi...", "tipo": "Bearer", "expiraEnSegundos": 3600, "usuario": { "id": 1, "rol": "USER", "...": "..." } }
+   ```
+
+3. En el resto de los endpoints se envía el header `Authorization: Bearer <token>`.
+
+| Acceso        | Endpoints                                                                  |
+| ------------- | -------------------------------------------------------------------------- |
+| Público       | `/api/auth/**`, `GET /api/libros/**`, `GET /api/categorias/**`, `/h2-console` |
+| Solo `ADMIN`  | `GET /api/usuarios/listarUser`                                             |
+| Autenticado   | Todo lo demás (alta/edición de libros y categorías, imágenes, carrito)     |
+
+- Sin token o con token inválido/vencido: `401 Unauthorized`. Sin el rol necesario: `403 Forbidden`.
+  Ambos con el mismo formato de error que el resto de la API.
+- Al arrancar se crea un administrador si no existe: `admin@ecommerce.com` / `admin123`
+  (se cambia con las variables `ADMIN_EMAIL` / `ADMIN_PASSWORD`). La clave del JWT se puede pasar
+  con la variable `JWT_SECRET`.
+- Si la base ya tenía usuarios con contraseña en texto plano, se encriptan automáticamente al
+  arrancar (`DataInitializer`), así siguen pudiendo loguearse.
+
+Clases involucradas: `config/SecurityConfig`, `config/DataInitializer`, `security/JwtService`,
+`security/JwtAuthenticationFilter`, `security/UsuarioDetailsService`, `security/SecurityErrorHandler`,
+`controller/AuthController`, `service/AuthService`, `model/Role`, `model/Usuario` (implementa `UserDetails`).
 
 ## Cómo probar la aplicación (Postman)
 
@@ -162,5 +197,7 @@ src/main/java/com/uade/e_commerce_ju/
 ├── repository/   interfaces Spring Data JPA
 ├── model/        entidades JPA (Usuario, Categoria, Libro, ImagenLibro, Carrito, ItemCarrito)
 ├── dto/          DTOs de entrada/salida por endpoint
-└── exception/    excepciones de dominio, manejadas por ApiExceptionHandler
+├── exception/    excepciones de dominio, manejadas por ApiExceptionHandler
+├── security/     JWT: generación/validación del token, filtro y errores 401/403
+└── config/       SecurityConfig (reglas de acceso, BCrypt, CORS) y DataInitializer
 ```

@@ -1,12 +1,15 @@
+-- Las passwords se cargan en texto plano para que sean legibles; al arrancar,
+-- DataInitializer las encripta con BCrypt antes de que la API reciba requests.
+--
 -- Los INSERT no fijan el id a mano: al hacerlo, la secuencia IDENTITY de H2
 -- queda desfasada y la primera alta hecha por la API choca contra la clave
 -- primaria. Como el script corre en orden, los ids quedan igual (1, 2, 3...).
 
-INSERT INTO usuarios (username, email, password, nombre, apellido)
-VALUES ('axel', 'axel@demo.com', 'password123', 'Axel', 'Antognoli');
+INSERT INTO usuarios (username, email, password, nombre, apellido, role)
+VALUES ('axel', 'axel@demo.com', 'password123', 'Axel', 'Antognoli', 'USER');
 
-INSERT INTO usuarios (username, email, password, nombre, apellido)
-VALUES ('tito', 'roso@demo.com', 'password456', 'tito', 'roso');
+INSERT INTO usuarios (username, email, password, nombre, apellido, role)
+VALUES ('tito', 'roso@demo.com', 'password456', 'tito', 'roso', 'USER');
 
 INSERT INTO categorias (nombre, descripcion)
 VALUES ('Programacion', 'Libros sobre desarrollo de software y tecnologia');

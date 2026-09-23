@@ -26,13 +26,13 @@
           }
         },
         "url": {
-          "raw": "http://localhost:8080/api/usuarios/register",
+          "raw": "http://localhost:8080/api/auth/register",
           "protocol": "http",
           "host": ["localhost"],
           "port": "8080",
           "path": ["api", "usuarios", "register"]
         },
-        "description": "POST /api/usuarios/register"
+        "description": "POST /api/auth/register"
       }
     },
     {
@@ -55,13 +55,13 @@
           }
         },
         "url": {
-          "raw": "http://localhost:8080/api/usuarios/login",
+          "raw": "http://localhost:8080/api/auth/login",
           "protocol": "http",
           "host": ["localhost"],
           "port": "8080",
           "path": ["api", "usuarios", "login"]
         },
-        "description": "POST /api/usuarios/login"
+        "description": "POST /api/auth/login"
       }
     },
     {
