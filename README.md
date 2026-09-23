@@ -144,6 +144,25 @@ Clases involucradas: `config/SecurityConfig`, `config/DataInitializer`, `securit
 `security/JwtAuthenticationFilter`, `security/UsuarioDetailsService`, `security/SecurityErrorHandler`,
 `controller/AuthController`, `service/AuthService`, `model/Role`, `model/Usuario` (implementa `UserDetails`).
 
+## Tests automatizados
+
+```powershell
+.\mvnw.cmd test
+```
+
+Corre contra su propia base H2 en memoria (no requiere MySQL levantado ni la app corriendo) y
+al finalizar muestra `Tests run: 31, Failures: 0, Errors: 0` y `BUILD SUCCESS`. Para correr una
+sola clase: `.\mvnw.cmd test -Dtest=NombreDeLaClase`.
+
+| Clase | Qué cubre |
+|---|---|
+| `ECommerceJuApplicationTests` | El contexto de Spring levanta correctamente |
+| `AuthServiceTest` | Registro (rol por defecto, hash de password, duplicados, formato de email, largo mínimo) y login (token, credenciales inválidas) — con mocks |
+| `CategoriaServiceTest` | Alta, nombre duplicado/vacío, categoría en uso, 404 — con mocks |
+| `UsuarioServiceTest` | Consulta de usuarios — con mocks |
+| `AuthControllerTest` | `/api/auth/register` y `/api/auth/login` de punta a punta (201/409/400/200/401) |
+| `SecurityIntegrationTest` | Público vs. protegido vs. rol `ADMIN` (200/401/403), usando el admin que crea `DataInitializer` |
+
 ## Cómo probar la aplicación (Postman)
 
 La forma de probar la aplicación es seguir la guía
@@ -200,4 +219,6 @@ src/main/java/com/uade/e_commerce_ju/
 ├── exception/    excepciones de dominio, manejadas por ApiExceptionHandler
 ├── security/     JWT: generación/validación del token, filtro y errores 401/403
 └── config/       SecurityConfig (reglas de acceso, BCrypt, CORS) y DataInitializer
+
+src/test/java/com/uade/e_commerce_ju/   tests unitarios (Mockito) e integración (MockMvc + H2)
 ```
