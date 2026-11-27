@@ -70,7 +70,7 @@ class AuthenticationServiceTest {
 
         assertThat(response.id()).isEqualTo(1L);
         assertThat(response.email()).isEqualTo("juan@test.com");
-        assertThat(response.role()).isEqualTo(Role.USER);
+        assertThat(response.rol()).isEqualTo(Role.USER.name());
         verify(passwordEncoder).encode("secreta123");
     }
 
@@ -103,7 +103,7 @@ class AuthenticationServiceTest {
             .nombre("Juan").apellido("Perez").role(Role.USER).build();
 
         when(usuarioRepository.findByEmail("juan@test.com")).thenReturn(Optional.of(usuario));
-        when(jwtService.generateToken(usuario)).thenReturn("token123");
+        when(jwtService.generarToken(usuario)).thenReturn("token123");
 
         AuthResponseDTO response = authenticationService.login(request);
 

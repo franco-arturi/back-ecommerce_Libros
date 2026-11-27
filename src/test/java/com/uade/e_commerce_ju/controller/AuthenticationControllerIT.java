@@ -32,7 +32,7 @@ class AuthenticationControllerIT {
             .andExpect(status().isCreated())
             .andExpect(jsonPath("$.id").exists())
             .andExpect(jsonPath("$.email").value("juan@test.com"))
-            .andExpect(jsonPath("$.role").value("USER"));
+            .andExpect(jsonPath("$.rol").value("USER"));
     }
 
     @Test
