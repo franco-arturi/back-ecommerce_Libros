@@ -65,6 +65,18 @@ class AuthControllerTest {
     }
 
     @Test
+    void registrarConPasswordCortaDevuelve400() throws Exception {
+        String invalido = """
+            {"username":"juanp","email":"juan@test.com","password":"12345","nombre":"Juan","apellido":"Perez"}
+            """;
+
+        mockMvc.perform(post("/api/auth/register")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(invalido))
+            .andExpect(status().isBadRequest());
+    }
+
+    @Test
     void loginConCredencialesValidasDevuelveToken() throws Exception {
         mockMvc.perform(post("/api/auth/register")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -80,6 +92,8 @@ class AuthControllerTest {
                 .content(login))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.token").isNotEmpty())
+            .andExpect(jsonPath("$.tipo").value("Bearer"))
+            .andExpect(jsonPath("$.expiraEnSegundos").isNumber())
             .andExpect(jsonPath("$.usuario.email").value("juan@test.com"));
     }
 

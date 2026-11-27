@@ -75,7 +75,7 @@ public class AuthenticationService {
             .role(Role.USER)
             .build();
 
-        return UsuarioResponseDTO.from(usuarioRepository.save(usuario));
+        return UsuarioResponseDTO.desde(usuarioRepository.save(usuario));
     }
 
     @Transactional(readOnly = true)
@@ -97,8 +97,8 @@ public class AuthenticationService {
         Usuario usuario = usuarioRepository.findByEmail(email)
             .orElseThrow(() -> new CredencialesInvalidasException(CREDENCIALES_INVALIDAS));
 
-        String token = jwtService.generateToken(usuario);
-        return new AuthResponseDTO(token, UsuarioResponseDTO.from(usuario));
+        String token = jwtService.generarToken(usuario);
+        return new AuthResponseDTO(token, UsuarioResponseDTO.desde(usuario));
     }
 
     private String obligatorio(String valor, String campo, int maximo) {
